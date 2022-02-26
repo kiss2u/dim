@@ -14,9 +14,7 @@ export const FolderView = (props: any) => {
     setOpen(!isOpen);
   }, [isOpen, setOpen]);
 
-  let children = [];
-
-  for (const file of files) {
+  const children = files.map((file: any, index: number) => {
     let item;
 
     if (file.type === "file") {
@@ -27,6 +25,7 @@ export const FolderView = (props: any) => {
           depth={depth + 1}
           select={select}
           unselect={unselect}
+          key={index}
         />
       );
     } else {
@@ -38,12 +37,13 @@ export const FolderView = (props: any) => {
           noBorder
           select={select}
           unselect={unselect}
+          key={index}
         />
       );
     }
 
-    children.push(item);
-  }
+    return item;
+  });
 
   return (
     <div className={`nested-folder ${!noBorder && "with-border"}`}>
@@ -106,6 +106,7 @@ export const NestedFileView = (props: any) => {
         files={item.content}
         select={select}
         unselect={unselect}
+        key={item.name}
       />
     );
   }
