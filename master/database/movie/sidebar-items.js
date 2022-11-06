@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["InsertableMovie","Struct reperesents a insertable movie entry"]]});
+initSidebarItems({"struct":[["Movie",""]]});

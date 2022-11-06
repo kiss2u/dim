@@ -3,7 +3,9 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -558,17 +560,6 @@
 <span id="553">553</span>
 <span id="554">554</span>
 <span id="555">555</span>
-<span id="556">556</span>
-<span id="557">557</span>
-<span id="558">558</span>
-<span id="559">559</span>
-<span id="560">560</span>
-<span id="561">561</span>
-<span id="562">562</span>
-<span id="563">563</span>
-<span id="564">564</span>
-<span id="565">565</span>
-<span id="566">566</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DatabaseError</span>;
 <span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
 <span class="kw">use</span> <span class="ident">std::num::NonZeroU32</span>;
@@ -701,7 +692,6 @@
     }
 }
 
-<span class="comment">// NOTE: Figure out the bug with this not being a valid postgres type</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Role</span> {
     <span class="ident">Owner</span>,
@@ -761,10 +751,6 @@
 
 <span class="kw">impl</span> <span class="ident">User</span> {
     <span class="doccomment">/// Method gets all entries from the table users.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// * `&amp;` - postgres &amp;ection</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_all</span>(<span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">DatabaseError</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(
             <span class="macro">sqlx::query!</span>(
@@ -827,7 +813,6 @@
     <span class="doccomment">/// Method gets one entry from the table users based on the username supplied and password.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `&amp;` - postgres &amp;ection</span>
     <span class="doccomment">/// * `uname` - username we wish to target and delete</span>
     <span class="doccomment">/// * `pw_hash` - hash of the password for the user we are trying to access</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">authenticate</span>(
@@ -873,7 +858,6 @@
     <span class="doccomment">/// NOTE: Return should always be 1</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `&amp;` - postgres &amp;ection</span>
     <span class="doccomment">/// * `uname` - username we wish to target and delete</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(
         <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
@@ -956,12 +940,8 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InsertableUser</span> {
-    <span class="doccomment">/// Method consumes a InsertableUser object and inserts the values under it into postgres users</span>
+    <span class="doccomment">/// Method consumes a InsertableUser object and inserts the values under it into database</span>
     <span class="doccomment">/// table as a new user</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Arguments</span>
-    <span class="doccomment">/// * `self` - instance of InsertableUser which gets consumed</span>
-    <span class="doccomment">/// * `&amp;` - postgres &amp;ection</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">User</span>, <span class="ident">DatabaseError</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="self">Self</span> {
             <span class="ident">username</span>,
@@ -1136,5 +1116,5 @@
     .<span class="ident">is_ok</span>()
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c35035cef 2022-05-30)" ></div>
 </body></html>

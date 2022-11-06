@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["admin_exists",""],["login",""],["register",""]]});
+initSidebarItems({"fn":[["login",""],["register",""]]});

@@ -3,7 +3,9 @@
         </a><h2 class="location"></h2>
     </nav>
     <nav class="sidebar"><a class="sidebar-logo" href="../../database/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><div class="theme-picker hidden"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="22" height="22" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../database/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
+                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
+                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -135,6 +137,13 @@
 <span id="130">130</span>
 <span id="131">131</span>
 <span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
 </pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::user::UserID</span>;
 <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::DatabaseError</span>;
 <span class="kw">use</span> <span class="ident">std::path::PathBuf</span>;
@@ -146,7 +155,6 @@
     <span class="kw">pub</span> <span class="ident">local_path</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">file_ext</span>: <span class="ident">String</span>,
 }
-
 <span class="kw">impl</span> <span class="ident">Asset</span> {
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">get_by_id</span>(
         <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
@@ -229,23 +237,32 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InsertableAsset</span> {
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Asset</span>, <span class="ident">DatabaseError</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">local_path</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">local_path</span>.<span class="ident">clone</span>();
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">insert_many</span>(
+        <span class="ident">tx</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
+        <span class="ident">assets</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>,
+    ) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Asset</span><span class="op">&gt;</span>, <span class="ident">DatabaseError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">results</span> <span class="op">=</span> <span class="macro">vec!</span>[];
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span> <span class="macro">sqlx::query_as_unchecked!</span>(
-            <span class="ident">Asset</span>,
-            <span class="string">&quot;SELECT * FROM assets WHERE local_path = ?&quot;</span>,
-            <span class="ident">local_path</span>
-        )
-        .<span class="ident">fetch_one</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">conn</span>)
-        .<span class="kw">await</span>
+        <span class="kw">for</span> <span class="ident">asset</span> <span class="kw">in</span> <span class="ident">assets</span> {
+            <span class="ident">results</span>.<span class="ident">push</span>(<span class="ident">asset</span>.<span class="ident">insert</span>(<span class="ident">tx</span>).<span class="kw">await</span><span class="question-mark">?</span>);
+        }
+
+        <span class="prelude-val">Ok</span>(<span class="ident">results</span>)
+    }
+
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">insert</span>(<span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;mut</span> <span class="ident"><span class="kw">crate</span>::Transaction</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Asset</span>, <span class="ident">DatabaseError</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">remote_url</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>();
+
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">x</span>) <span class="op">=</span>
+            <span class="macro">sqlx::query_as_unchecked!</span>(<span class="ident">Asset</span>, <span class="string">&quot;SELECT * FROM assets WHERE remote_url = ?&quot;</span>, <span class="ident">url</span>)
+                .<span class="ident">fetch_one</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">conn</span>)
+                .<span class="kw">await</span>
         {
             <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">x</span>);
         }
 
-        <span class="macro">sqlx::query_as_unchecked!</span>(
-            <span class="ident">Asset</span>,
-            <span class="string">&quot;INSERT OR IGNORE INTO assets (remote_url, local_path, file_ext)
+        <span class="macro">sqlx::query!</span>(
+            <span class="string">&quot;INSERT INTO assets (remote_url, local_path, file_ext)
                 VALUES ($1, $2, $3)&quot;</span>,
             <span class="self">self</span>.<span class="ident">remote_url</span>,
             <span class="self">self</span>.<span class="ident">local_path</span>,
@@ -255,11 +272,10 @@
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="comment">// NOTE: asset is guaranteed to be in the table if we get here</span>
-
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">sqlx::query_as_unchecked!</span>(
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="macro">sqlx::query_as!</span>(
             <span class="ident">Asset</span>,
-            <span class="string">&quot;SELECT * FROM assets WHERE local_path = ?&quot;</span>,
-            <span class="ident">local_path</span>
+            <span class="string">r#&quot;SELECT id as &quot;id!&quot;, remote_url, local_path, file_ext FROM assets WHERE remote_url = ?&quot;#</span>,
+            <span class="ident">url</span>
         )
         .<span class="ident">fetch_one</span>(<span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">conn</span>)
         .<span class="kw">await</span><span class="question-mark">?</span>;
@@ -268,5 +284,5 @@
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.62.0 (a8314ef7d 2022-06-27)" ></div>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="database" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0-nightly (c35035cef 2022-05-30)" ></div>
 </body></html>
